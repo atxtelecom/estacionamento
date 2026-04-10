@@ -23,6 +23,7 @@ export default async function AdminPage() {
     { href: "/admin/vagas", label: "Vagas", icon: "🅿️", desc: "Gerenciar vagas", cor: "bg-blue-600" },
     { href: "/admin/tarifas", label: "Tarifas", icon: "💰", desc: "Configurar preços", cor: "bg-green-600" },
     { href: "/admin/mensalistas", label: "Mensalistas", icon: "👥", desc: "Clientes mensais", cor: "bg-purple-600" },
+    { href: "/admin/operadores", label: "Operadores", icon: "👤", desc: "Equipe operacional", cor: "bg-cyan-600" },
     { href: "/admin/relatorios", label: "Relatórios", icon: "📊", desc: "Faturamento e uso", cor: "bg-orange-500" },
   ];
 

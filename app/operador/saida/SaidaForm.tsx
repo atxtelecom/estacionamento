@@ -2,6 +2,7 @@
 
 import { useActionState, useCallback, useEffect, useState } from "react";
 import { buscarTicketPorPlaca, registrarSaida } from "../actions";
+import { TicketImpressao, BotaoImprimir } from "@/components/TicketImpressao";
 
 type TicketInfo = {
   ticket: { id: string; placa: string; tipo: string; vaga: number; entrada: string };
@@ -10,7 +11,7 @@ type TicketInfo = {
 
 type Comprovante = {
   placa: string; vaga: number; valor: number; tipo: string;
-  entrada: string; saida: string;
+  entrada: string; saida: string; duracao: string;
 };
 
 type SaidaState = { erro?: string; sucesso?: boolean } & Partial<Comprovante>;
@@ -74,6 +75,19 @@ function Comprovante({
         </dl>
       </div>
 
+      <TicketImpressao
+        tipo="saida"
+        placa={dados.placa}
+        vaga={dados.vaga}
+        entrada={dados.entrada}
+        saida={dados.saida}
+        duracao={dados.duracao}
+        valor={dados.valor}
+        tipoVeiculo={dados.tipo}
+      />
+
+      <BotaoImprimir />
+
       <button
         onClick={onNovaSaida}
         className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-xl text-lg transition"
@@ -106,6 +120,7 @@ export default function SaidaForm({ placaInicial = "" }: { placaInicial?: string
       tipo: saidaState.tipo!,
       entrada: saidaState.entrada!,
       saida: saidaState.saida!,
+      duracao: (saidaState as { duracao?: string }).duracao ?? "",
     });
     setTicketInfo(null);
     setPlaca("");

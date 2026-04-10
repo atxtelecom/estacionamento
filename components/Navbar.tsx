@@ -16,6 +16,7 @@ const LINKS: Record<string, { href: string; label: string }[]> = {
     { href: "/admin/vagas", label: "Vagas" },
     { href: "/admin/tarifas", label: "Tarifas" },
     { href: "/admin/mensalistas", label: "Mensalistas" },
+    { href: "/admin/operadores", label: "Operadores" },
     { href: "/admin/relatorios", label: "Relatórios" },
   ],
   OPERADOR: [

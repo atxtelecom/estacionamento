@@ -79,7 +79,7 @@ export async function registrarEntrada(_prev: unknown, formData: FormData) {
   });
 
   revalidatePath("/operador");
-  return { sucesso: true, ticketId: ticket.id, placa, vaga: vaga.numero };
+  return { sucesso: true, ticketId: ticket.id, placa, vaga: vaga.numero, entrada: ticket.entrada.toISOString() };
 }
 
 // ─── Buscar Ticket por Placa ──────────────────────────────────────────────────
@@ -170,6 +170,14 @@ export async function registrarSaida(_prev: unknown, formData: FormData) {
 
   revalidatePath("/operador");
 
+  const duracaoMs = saida.getTime() - ticket.entrada.getTime();
+  const duracaoMin = Math.ceil(duracaoMs / 60000);
+  const duracaoH = Math.floor(duracaoMin / 60);
+  const duracaoResto = duracaoMin % 60;
+  const duracao = duracaoMin < 60
+    ? `${duracaoMin} min`
+    : duracaoResto > 0 ? `${duracaoH}h ${duracaoResto}min` : `${duracaoH}h`;
+
   return {
     sucesso: true,
     placa: ticket.veiculo.placa,
@@ -178,5 +186,6 @@ export async function registrarSaida(_prev: unknown, formData: FormData) {
     tipo: ticket.veiculo.tipo,
     entrada: ticket.entrada.toISOString(),
     saida: saida.toISOString(),
+    duracao,
   };
 }

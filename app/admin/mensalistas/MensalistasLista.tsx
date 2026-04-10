@@ -257,6 +257,26 @@ export default function MensalistasLista({ mensalistas: inicial }: { mensalistas
                     </button>
                   )}
                 </div>
+
+                {/* WhatsApp para inadimplentes */}
+                {m.status === "INADIMPLENTE" && m.telefone && (
+                  <a
+                    href={`https://wa.me/55${m.telefone.replace(/\D/g, "")}?text=${encodeURIComponent(
+                      `Olá ${m.nome}! Seu plano de estacionamento venceu em ${new Date(m.vencimento).toLocaleDateString("pt-BR")}. Entre em contato para renovar e continuar utilizando o estacionamento. Obrigado!`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2.5 rounded-xl text-sm transition"
+                  >
+                    📲 WhatsApp — Cobrar
+                  </a>
+                )}
+
+                {m.status === "INADIMPLENTE" && !m.telefone && (
+                  <p className="text-xs text-gray-400 text-center pt-1">
+                    Sem telefone cadastrado para notificação
+                  </p>
+                )}
               </div>
             )}
           </div>

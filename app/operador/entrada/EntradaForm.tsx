@@ -2,6 +2,7 @@
 
 import { useActionState, useCallback, useState } from "react";
 import { registrarEntrada } from "../actions";
+import { TicketImpressao, BotaoImprimir } from "@/components/TicketImpressao";
 
 interface Vaga { id: string; numero: number; categoria: string }
 
@@ -10,6 +11,7 @@ type EntradaState = {
   sucesso?: boolean;
   placa?: string;
   vaga?: number;
+  entrada?: string;
 };
 
 const ICONE_CAT: Record<string, string> = { CARRO: "🚗", MOTO: "🏍️", PCD: "♿" };
@@ -56,6 +58,15 @@ export default function EntradaForm({ vagasLivres }: { vagasLivres: Vaga[] }) {
             </time>
           </p>
         </div>
+        <TicketImpressao
+          tipo="entrada"
+          placa={state.placa!}
+          vaga={state.vaga!}
+          entrada={state.entrada ?? new Date().toISOString()}
+        />
+
+        <BotaoImprimir />
+
         <button
           onClick={handleNovaEntrada}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl text-lg transition"
