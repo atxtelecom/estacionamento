@@ -3,7 +3,8 @@
 import { useActionState, useState } from "react";
 import { criarMensalista, renovarPlano, alterarStatus } from "./actions";
 import type { ActionState } from "./actions";
-import type { StatusMensalista } from "@prisma/client";
+
+type StatusMensalista = "ATIVO" | "INADIMPLENTE" | "BLOQUEADO" | "CANCELADO";
 
 interface Veiculo { placa: string; descricao: string | null }
 interface Mensalista {
