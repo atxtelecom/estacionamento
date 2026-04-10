@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: var(--font-geist), system-ui, sans-serif;
+}
+
+/* Toque mais responsivo nas maquininhas */
+* {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Botões e inputs com altura mínima confortável para toque */
+button, [role="button"] {
+  min-height: 48px;
+}
+
+input, select, textarea {
+  font-size: 16px; /* evita zoom automático no iOS/Android */
+}
+
+/* ── Impressão térmica (papel 80mm) ─────────────────────────────────────── */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body > *:not(#ticket-print) {
+    display: none !important;
+  }
+
+  #ticket-print {
+    display: block !important;
+    width: 72mm; /* margem interna do papel 80mm */
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+    font-size: 11pt;
+    color: #000;
+  }
+
+  @page {
+    size: 80mm auto;
+    margin: 3mm;
+  }
+}

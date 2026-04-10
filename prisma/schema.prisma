@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Perfil {
+  ADMIN
+  OPERADOR
+  MENSALISTA
+}
+
+enum CategoriaVaga {
+  CARRO
+  MOTO
+  PCD
+}
+
+enum StatusVaga {
+  LIVRE
+  OCUPADA
+  RESERVADA
+  INATIVA
+}
+
+enum TipoVeiculo {
+  ROTATIVO
+  MENSALISTA
+}
+
+enum ModalidadeTarifa {
+  MISTA
+  POR_HORA
+  DIARIA_FIXA
+}
+
+enum FormaPagamento {
+  DINHEIRO
+  PIX
+  CARTAO_DEBITO
+  CARTAO_CREDITO
+}
+
+enum StatusTicket {
+  ABERTO
+  FECHADO
+  CANCELADO
+}
+
+enum StatusMensalista {
+  ATIVO
+  INADIMPLENTE
+  BLOQUEADO
+  CANCELADO
+}
+
+// ─── Modelos ──────────────────────────────────────────────────────────────────
+
+model Usuario {
+  id           String   @id @default(cuid())
+  nome         String
+  email        String   @unique
+  senhaHash    String
+  perfil       Perfil
+  ativo        Boolean  @default(true)
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  ticketsOperados Ticket[]   @relation("OperadorTicket")
+  mensalista      Mensalista?
+
+  @@map("usuarios")
+}
+
+model Vaga {
+  id        String        @id @default(cuid())
+  numero    Int           @unique
+  categoria CategoriaVaga @default(CARRO)
+  status    StatusVaga    @default(LIVRE)
+  ativo     Boolean       @default(true)
+
+  tickets Ticket[]
+
+  @@map("vagas")
+}
+
+model Veiculo {
+  id           String      @id @default(cuid())
+  placa        String      @unique
+  tipo         TipoVeiculo @default(ROTATIVO)
+  descricao    String?
+  criadoEm    DateTime    @default(now())
+
+  mensalista   Mensalista? @relation(fields: [mensalistaId], references: [id])
+  mensalistaId String?
+  tickets      Ticket[]
+
+  @@map("veiculos")
+}
+
+model Mensalista {
+  id           String           @id @default(cuid())
+  nome         String
+  cpf          String           @unique
+  telefone     String?
+  plano        String
+  valor        Decimal          @db.Decimal(10, 2)
+  vencimento   DateTime
+  status       StatusMensalista @default(ATIVO)
+  criadoEm    DateTime         @default(now())
+  atualizadoEm DateTime        @updatedAt
+
+  usuario      Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId    String   @unique
+
+  veiculos     Veiculo[]
+
+  @@index([status])
+  @@index([vencimento])
+  @@map("mensalistas")
+}
+
+model Tarifa {
+  id             String           @id @default(cuid())
+  nome           String
+  modalidade     ModalidadeTarifa
+  valor1h        Decimal          @db.Decimal(10, 2)
+  valorHoraExtra Decimal          @db.Decimal(10, 2)
+  valorDiaria    Decimal          @db.Decimal(10, 2)
+  horasAteDiaria Int              @default(12)
+  ativa          Boolean          @default(true)
+  criadoEm      DateTime         @default(now())
+  atualizadoEm  DateTime         @updatedAt
+
+  @@map("tarifas")
+}
+
+model Ticket {
+  id             String          @id @default(cuid())
+  entrada        DateTime        @default(now())
+  saida          DateTime?
+  valor          Decimal?        @db.Decimal(10, 2)
+  formaPagamento FormaPagamento?
+  status         StatusTicket    @default(ABERTO)
+  observacao     String?
+  criadoEm      DateTime        @default(now())
+  atualizadoEm  DateTime        @updatedAt
+
+  vaga         Vaga     @relation(fields: [vagaId], references: [id])
+  vagaId       String
+
+  veiculo      Veiculo  @relation(fields: [veiculoId], references: [id])
+  veiculoId    String
+
+  operador     Usuario  @relation("OperadorTicket", fields: [operadorId], references: [id])
+  operadorId   String
+
+  // Índices para queries de relatório (status+entrada é o mais consultado)
+  @@index([status, entrada])
+  @@index([entrada])
+  @@index([veiculoId, status])
+  @@map("tickets")
+}
+
