@@ -26,6 +26,14 @@ export async function toggleVaga(id: string, ativo: boolean) {
   const session = await auth();
   if (!session || session.user.perfil !== "ADMIN") return { erro: "Sem permissão." };
 
+  // Impede desativar vaga com ticket aberto
+  if (!ativo) {
+    const ticketAberto = await prisma.ticket.findFirst({
+      where: { vagaId: id, status: "ABERTO" },
+    });
+    if (ticketAberto) return { erro: "Não é possível desativar uma vaga com veículo estacionado." };
+  }
+
   await prisma.vaga.update({ where: { id }, data: { ativo, status: ativo ? "LIVRE" : "INATIVA" } });
   revalidatePath("/admin/vagas");
   return { sucesso: true };

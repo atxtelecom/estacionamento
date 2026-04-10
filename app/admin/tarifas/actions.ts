@@ -40,9 +40,11 @@ export async function ativarTarifa(id: string) {
   const session = await auth();
   if (!session || session.user.perfil !== "ADMIN") return { erro: "Sem permissão." };
 
-  // Desativa todas e ativa só a selecionada
-  await prisma.tarifa.updateMany({ data: { ativa: false } });
-  await prisma.tarifa.update({ where: { id }, data: { ativa: true } });
+  // Transação garante que nunca haja duas tarifas ativas ao mesmo tempo
+  await prisma.$transaction([
+    prisma.tarifa.updateMany({ data: { ativa: false } }),
+    prisma.tarifa.update({ where: { id }, data: { ativa: true } }),
+  ]);
 
   revalidatePath("/admin/tarifas");
   return { sucesso: true };

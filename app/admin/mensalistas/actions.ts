@@ -39,7 +39,7 @@ export async function criarMensalista(
   if (cpfExiste) return { erro: "CPF já cadastrado." };
   if (emailExiste) return { erro: "Email já cadastrado." };
 
-  const senhaHash = await bcrypt.hash(cpf.slice(-6), 10); // senha inicial = últimos 6 dígitos do CPF
+  const senhaHash = await bcrypt.hash(cpf.slice(-6), 12); // senha inicial = últimos 6 dígitos do CPF
 
   await prisma.$transaction(async (tx) => {
     const usuario = await tx.usuario.create({

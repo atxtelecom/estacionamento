@@ -22,6 +22,12 @@ export async function registrarEntrada(_prev: unknown, formData: FormData) {
     return { erro: "Preencha todos os campos." };
   }
 
+  // Valida formato de placa: Mercosul (ABC1D23) ou antiga (ABC1234)
+  const placaValida = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/.test(placa);
+  if (!placaValida) {
+    return { erro: "Placa inválida. Use o formato ABC1D23 (Mercosul) ou ABC1234." };
+  }
+
   // Verifica se a vaga está livre
   const vaga = await prisma.vaga.findUnique({ where: { id: vagaId } });
   if (!vaga || vaga.status !== "LIVRE") {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useRouter } from "next/navigation";
 import { criarMensalista, renovarPlano, alterarStatus } from "./actions";
 import type { ActionState } from "./actions";
 
@@ -159,6 +160,7 @@ function RenovarForm({ mensalista, onConcluido }: { mensalista: Mensalista; onCo
 }
 
 export default function MensalistasLista({ mensalistas: inicial }: { mensalistas: Mensalista[] }) {
+  const router = useRouter();
   const [mensalistas, setMensalistas] = useState(inicial);
   const [modo, setModo] = useState<"lista" | "novo" | { renovar: Mensalista }>("lista");
   const [expandido, setExpandido] = useState<string | null>(null);
@@ -170,10 +172,10 @@ export default function MensalistasLista({ mensalistas: inicial }: { mensalistas
   }
 
   if (modo === "novo") {
-    return <NovoMensalistaForm onConcluido={() => { setModo("lista"); window.location.reload(); }} />;
+    return <NovoMensalistaForm onConcluido={() => { setModo("lista"); router.refresh(); }} />;
   }
   if (typeof modo === "object" && "renovar" in modo) {
-    return <RenovarForm mensalista={modo.renovar} onConcluido={() => { setModo("lista"); window.location.reload(); }} />;
+    return <RenovarForm mensalista={modo.renovar} onConcluido={() => { setModo("lista"); router.refresh(); }} />;
   }
 
   return (

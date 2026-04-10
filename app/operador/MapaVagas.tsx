@@ -40,7 +40,7 @@ export default function MapaVagas({ vagas }: { vagas: Vaga[] }) {
         <span className="text-xs text-gray-400">atualiza a cada 30s</span>
       </div>
 
-      <div className="grid grid-cols-8 sm:grid-cols-10 gap-1.5">
+      <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-1.5">
         {vagas.map((vaga) => (
           <div
             key={vaga.id}

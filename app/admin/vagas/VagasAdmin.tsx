@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { criarVaga, toggleVaga } from "./actions";
 
 interface Vaga { id: string; numero: number; categoria: string; status: string; ativo: boolean; }
@@ -14,6 +15,7 @@ const COR_STATUS: Record<string, string> = {
 };
 
 export default function VagasAdmin({ vagas: inicial }: { vagas: Vaga[] }) {
+  const router = useRouter();
   const [vagas, setVagas] = useState(inicial);
   const [novaCategoria, setNovaCategoria] = useState("CARRO");
   const [carregando, setCarregando] = useState(false);
@@ -31,11 +33,12 @@ export default function VagasAdmin({ vagas: inicial }: { vagas: Vaga[] }) {
     setCarregando(false);
     if (res.erro) { setErro(res.erro); return; }
     setSucesso("Vaga criada!");
-    window.location.reload();
+    router.refresh();
   }
 
   async function handleToggle(id: string, ativo: boolean) {
-    await toggleVaga(id, !ativo);
+    const res = await toggleVaga(id, !ativo);
+    if (res.erro) { setErro(res.erro); return; }
     setVagas((prev) => prev.map((v) =>
       v.id === id ? { ...v, ativo: !ativo, status: !ativo ? "LIVRE" : "INATIVA" } : v
     ));
@@ -90,7 +93,7 @@ export default function VagasAdmin({ vagas: inicial }: { vagas: Vaga[] }) {
       {/* Mapa de vagas */}
       <div className="bg-white rounded-2xl shadow p-4">
         <h2 className="font-bold text-gray-700 mb-3 text-sm">Vagas ({vagas.length})</h2>
-        <div className="grid grid-cols-6 sm:grid-cols-10 gap-2">
+        <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
           {vagas.map((vaga) => (
             <button
               key={vaga.id}
