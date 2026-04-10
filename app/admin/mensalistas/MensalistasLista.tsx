@@ -24,7 +24,14 @@ const STATUS_LABEL: Record<string, string> = {
   ATIVO: "Ativo", INADIMPLENTE: "Inadimplente", BLOQUEADO: "Bloqueado", CANCELADO: "Cancelado",
 };
 
+function diasRestantes(vencimento: string, agora: number) {
+  return Math.ceil((new Date(vencimento).getTime() - agora) / 86400000);
+}
+
 function NovoMensalistaForm({ onConcluido }: { onConcluido: () => void }) {
+  const [defaultVencimento] = useState(() =>
+    new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0]
+  );
   const [state, action, isPending] = useActionState<ActionState, FormData>(criarMensalista, {});
 
   if (state.sucesso) {
@@ -82,7 +89,7 @@ function NovoMensalistaForm({ onConcluido }: { onConcluido: () => void }) {
       <div>
         <label className="text-xs font-semibold text-gray-600 block mb-1">Vencimento</label>
         <input name="vencimento" type="date" required
-          defaultValue={new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0]}
+          defaultValue={defaultVencimento}
           className="w-full border-2 border-gray-200 rounded-xl px-3 py-3 text-base outline-none focus:border-blue-400 transition" />
       </div>
 
@@ -155,14 +162,12 @@ export default function MensalistasLista({ mensalistas: inicial }: { mensalistas
   const [mensalistas, setMensalistas] = useState(inicial);
   const [modo, setModo] = useState<"lista" | "novo" | { renovar: Mensalista }>("lista");
   const [expandido, setExpandido] = useState<string | null>(null);
+  const [agora] = useState(() => Date.now());
 
   async function handleAlterarStatus(id: string, status: StatusMensalista) {
     await alterarStatus(id, status);
     setMensalistas((prev) => prev.map((m) => m.id === id ? { ...m, status } : m));
   }
-
-  const diasRestantes = (vencimento: string) =>
-    Math.ceil((new Date(vencimento).getTime() - Date.now()) / 86400000);
 
   if (modo === "novo") {
     return <NovoMensalistaForm onConcluido={() => { setModo("lista"); window.location.reload(); }} />;
@@ -174,7 +179,7 @@ export default function MensalistasLista({ mensalistas: inicial }: { mensalistas
   return (
     <div className="space-y-3">
       {mensalistas.map((m) => {
-        const dias = diasRestantes(m.vencimento);
+        const dias = diasRestantes(m.vencimento, agora);
         const aberto = expandido === m.id;
 
         return (
